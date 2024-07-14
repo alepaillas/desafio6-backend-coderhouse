@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
+import envConfig from "./env.config.mjs";
 
 // Para conectar a MongoDb Atlas según documentación
-const mongoUri =
-  "mongodb+srv://coderUser:jajalolxd123@cluster0.nr27ayq.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0";
+const mongoUri = envConfig.MONGO_URI;
 export { mongoUri };
 const clientOptions = {
   serverApi: { version: "1", strict: true, deprecationErrors: true },

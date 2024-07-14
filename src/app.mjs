@@ -12,6 +12,11 @@ import passport from "passport";
 import initializePassport from "./config/passport.config.mjs";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import envConfig from "./config/env.config.mjs";
+
+// Definimos el puerto en el que se ejecutará el servidor, utilizando el puerto definido en las variables de entorno si está disponible, de lo contrario, utilizamos el puerto 8080 por defecto
+const PORT = envConfig.PORT || 8080;
+const SESSION_SECRET = envConfig.SESSION_SECRET;
 
 // Conexión con la base de datos
 initializeMongoDb();
@@ -28,8 +33,6 @@ process.on("SIGTERM", async () => {
 
 // Creamos una nueva instancia de la aplicación express
 const app = express();
-// Definimos el puerto en el que se ejecutará el servidor, utilizando el puerto definido en las variables de entorno si está disponible, de lo contrario, utilizamos el puerto 8080 por defecto
-const PORT = process.env.PORT || 8080;
 
 app.use(cookieParser());
 
@@ -49,7 +52,7 @@ app.use(
       //mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true }, // default desde mongo 5
       ttl: 15, // time-to-live en segundos, después de 15s de inactividad se elimina la sesión en la BBDD
     }),
-    secret: "CodigoSecreto", // clave para encriptar los datos de sesión
+    secret: SESSION_SECRET, // clave para encriptar los datos de sesión
     resave: true, // guarda la sesión incluso si no se ha modificado desde el último request
     // solo crea sesiones que han sido modificadas con un request,
     // es decir solo si se ha interactuado con la página, por ejemplo con un login

@@ -4,8 +4,12 @@ import userDao from "../dao/mongoDao/user.dao.mjs";
 import { createHash, isValidPassword } from "../utils/bcrypt.mjs";
 import GitHubStrategy from "passport-github2";
 import jwt from "passport-jwt";
+import envConfig from "./env.config.mjs";
 
-const PRIVATE_KEY = "CoderKeyQueFuncionaComoUnSecret";
+const JWT_PRIVATE_KEY = envConfig.JWT_PRIVATE_KEY;
+const COOKIE_TOKEN = envConfig.COOKIE_TOKEN;
+const GITHUB_CLIENT_ID = envConfig.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = envConfig.GITHUB_CLIENT_SECRET;
 
 const localStrategy = local.Strategy;
 const JWTStrategy = jwt.Strategy;
@@ -14,7 +18,7 @@ const ExtractJWT = jwt.ExtractJwt;
 const cookieExtractor = (req) => {
   let token = null;
   if (req && req.cookies) {
-    token = req.cookies["coderCookieToken"];
+    token = req.cookies[COOKIE_TOKEN];
   }
   return token;
 };
@@ -71,8 +75,8 @@ const initializePassport = () => {
     "github",
     new GitHubStrategy(
       {
-        clientID: "Iv23lim9WUlsDVBGvlNT",
-        clientSecret: "3d471ed9d82dc3ed85e92c2b0787ce31b4021bc9",
+        clientID: GITHUB_CLIENT_ID,
+        clientSecret: GITHUB_CLIENT_SECRET,
         callbackURL: "http://localhost:8080/api/session/githubCallback",
         scope: ["user:email"],
       },
@@ -121,7 +125,7 @@ const initializePassport = () => {
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
-        secretOrKey: PRIVATE_KEY,
+        secretOrKey: JWT_PRIVATE_KEY,
       },
       async (jwt_payload, done) => {
         try {
