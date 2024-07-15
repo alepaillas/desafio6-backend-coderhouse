@@ -1,10 +1,10 @@
 import passport from "passport";
 import local from "passport-local";
-import userDao from "../dao/mongoDao/user.dao.mjs";
-import { createHash, isValidPassword } from "../utils/bcrypt.mjs";
 import GitHubStrategy from "passport-github2";
 import jwt from "passport-jwt";
+import { createHash, isValidPassword } from "../utils/bcrypt.mjs";
 import envConfig from "./env.config.mjs";
+import userRepository from "../persistences/mongo/repositories/users.repository.mjs";
 
 const JWT_PRIVATE_KEY = envConfig.JWT_PRIVATE_KEY;
 const COOKIE_TOKEN = envConfig.COOKIE_TOKEN;
@@ -31,7 +31,7 @@ const initializePassport = () => {
       async (req, email, password, done) => {
         const { first_name, last_name, age } = req.body;
         try {
-          const user = await userDao.getByEmail(email);
+          const user = await userRepository.getByEmail(email);
           if (user) {
             console.log("User already exists");
             return done(null, false, { message: "User already exists" });
@@ -43,7 +43,7 @@ const initializePassport = () => {
             age,
             password: createHash(password),
           };
-          const result = await userDao.create(newUser);
+          const result = await userRepository.create(newUser);
           return done(null, result);
         } catch (error) {
           return done("Error al obtener el usuario: " + error);
@@ -58,7 +58,7 @@ const initializePassport = () => {
       { usernameField: "email", passReqToCallback: true },
       async (req, email, password, done) => {
         try {
-          const user = await userDao.getByEmail(email);
+          const user = await userRepository.getByEmail(email);
           if (!user || !isValidPassword(user, password)) {
             return done(null, false, { message: "Invalid email or password" });
           }
@@ -82,7 +82,7 @@ const initializePassport = () => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          console.log(profile);
+          //console.log(profile);
 
           // Obtener el correo electrónico del arreglo emails
           const email =
@@ -98,7 +98,7 @@ const initializePassport = () => {
             );
           }
           //console.log(email);
-          const user = await userDao.getByEmail(email);
+          const user = await userRepository.getByEmail(email);
           if (!user) {
             const newUser = {
               first_name: profile._json.name,
@@ -107,7 +107,7 @@ const initializePassport = () => {
               age: "",
               password: "",
             };
-            const result = await userDao.create(newUser);
+            const result = await userRepository.create(newUser);
             return done(null, result);
           } else {
             return done(null, user); // User found and authenticated
@@ -141,7 +141,7 @@ const initializePassport = () => {
     done(null, user._id);
   });
   passport.deserializeUser(async (id, done) => {
-    const user = await userDao.getById(id);
+    const user = await userRepository.getById(id);
     done(null, user);
   });
 };

@@ -28,7 +28,7 @@ formularioRegistro.addEventListener("submit", async (event) => {
 
     if (response.ok) {
       alert("Usuario registrado exitosamente");
-      window.location.href = "/"; // Redirect to the login page or show success message
+      window.location.href = "/login"; // Redirect to the login page or show success message
     } else {
       const errorResponse = await response.json(); // Parse JSON error response from server
       throw new Error(

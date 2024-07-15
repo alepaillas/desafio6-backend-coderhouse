@@ -30,13 +30,13 @@ const addProductToCart = async (cid, pid, quantity = 1) => {
 
   const productInCart = await cartModel.findOneAndUpdate(
     { _id: cid, "products.product": pid },
-    { $inc: { "products.$.quantity": quantity } }
+    { $inc: { "products.$.quantity": quantity } },
   );
 
   if (!productInCart) {
     await cartModel.findOneAndUpdate(
       { _id: cid },
-      { $push: { products: { product: pid, quantity } } }
+      { $push: { products: { product: pid, quantity } } },
     );
   }
 
@@ -44,14 +44,14 @@ const addProductToCart = async (cid, pid, quantity = 1) => {
   return cartUpdate;
 };
 
-const removeProductFromCart = async (cid, pid) => {
+const deleteProductInCart = async (cid, pid) => {
   // Check if cart exists
   const cart = await cartModel.findOne({ _id: cid });
   if (!cart) return { cart: false };
 
   // Check if product exists in the cart
   const productInCart = cart.products.find(
-    (p) => p.product._id.toString() === pid
+    (p) => p.product._id.toString() === pid,
   );
   if (!productInCart) return { product: false };
 
@@ -59,7 +59,7 @@ const removeProductFromCart = async (cid, pid) => {
   const updatedCart = await cartModel.findOneAndUpdate(
     { _id: cid },
     { $pull: { products: { product: pid } } },
-    { new: true } // Return the updated cart
+    { new: true }, // Return the updated cart
   );
 
   return updatedCart;
@@ -72,7 +72,7 @@ const updateProductQuantity = async (cid, pid, newQuantity) => {
 
   // Check if product exists in the cart
   const productInCart = cart.products.find(
-    (p) => p.product._id.toString() === pid
+    (p) => p.product._id.toString() === pid,
   );
   if (!productInCart) return { product: false };
 
@@ -80,7 +80,7 @@ const updateProductQuantity = async (cid, pid, newQuantity) => {
   const updatedCart = await cartModel.findOneAndUpdate(
     { _id: cid, "products.product": pid },
     { $set: { "products.$.quantity": newQuantity } },
-    { new: true } // Return the updated cart
+    { new: true }, // Return the updated cart
   );
   return updatedCart;
 };
@@ -91,7 +91,7 @@ const clearCart = async (cid) => {
   const cartEmpty = await cartModel.findOneAndUpdate(
     { _id: cid },
     { $set: { products: [] } },
-    { new: true }
+    { new: true },
   );
   return cartEmpty;
 };
@@ -114,7 +114,7 @@ const update = async (cid, data) => {
   const cart = await cartModel.updateOne(
     { _id: cid },
     { $set: { products: data } },
-    { new: true }
+    { new: true },
   );
   return cart;
 };
@@ -125,7 +125,7 @@ export default {
   create,
   deleteOne,
   addProductToCart,
-  removeProductFromCart,
+  deleteProductInCart,
   updateProductQuantity,
   clearCart,
   update,

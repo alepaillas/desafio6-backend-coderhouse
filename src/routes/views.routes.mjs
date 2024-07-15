@@ -11,10 +11,17 @@ router.get("/", (req, res) => {
       isAdmin: req.session.user.role === "admin",
     });
   } else {
-    res.render("login", {
+    res.render("index", {
       style: "output.css",
+      user: {email: "anon"},
     });
   }
+});
+
+router.get("/login", (req, res) => {
+  res.render("login", {
+    style: "output.css",
+  });
 });
 
 router.get("/register", (req, res) => {
